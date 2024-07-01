@@ -1,6 +1,7 @@
 import pygame
 import time
 from sys import exit
+import math
 
 pygame.init()
 
@@ -21,10 +22,15 @@ class MainEvent():
     def __init__(self):
         
         self.gravity_var = 0.01
-        self.t0 = time.time()
-
-
+        self.t0 = time.time() 
+    
+    def trajectory(self, x, g, v, theta): # gravity, velocity, angle
+        return x*math.tan(theta)-g*x**2/2*v**2*math.cos(theta)**2
+    
     def Main(self):
+        
+        traj_x = 0 # trajectory coordinates for rect_1.move_ip()
+        traj_y = 0
         
         moving = False
         
@@ -42,22 +48,27 @@ class MainEvent():
                     moving = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     moving = False
-                elif event.type == pygame.MOUSEMOTION and moving: # why elif used instead of if, what's the difference?   
-                    rect_1.move_ip(event.rel)
-                
-            if rect_1.y < display_h-50 and moving == False: # gravity occuring until object hits ground
+                elif event.type == pygame.MOUSEMOTION and moving: #every time object is moved by mouse, gravity restarts
                     
-                t1 = time.time()
-        
-                if t1 - self.t0 >= 0.01: # if time elapsed > 10 milisecond
-                    self.gravity_var += 0.0981 # object falls down at 0.0981 meters/10 milisecond
-                    # pygame does not accept y coordinate change less than 0.01, but ∆y is kept at 0.0981
-                    rect_1.move_ip(0, self.gravity_var)
-                    self.t0 = t1
+                    self.gravity_var = 0.01
+                    
+                    rect_1.move_ip(event.rel)
+                    dx, dy = event.rel
+            
+            if rect_1.y < display_h-50 and moving == False: # rectangle is let go, trajectory is calculated
                 
-            elif pygame.MOUSEMOTION and moving: # every time object is moved by mouse, gravity restarts
-                self.gravity_var = 0.01
-        
+                velocity = abs(dx)
+                angle = math.atan2(dy, dx)
+                
+                t1 = time.time()
+
+                if t1 - self.t0 >= 0.01: # if time elapsed > 10 milisecond
+                    traj_x+=0.01
+                    self.gravity_var+=0.0981
+                    traj_y -= self.trajectory(traj_x, self.gravity_var, velocity, angle)
+                    rect_1.move_ip(traj_x, traj_y)
+                    self.t0 = t1        
+
             pygame.display.update()
             clock.tick(60)
             
