@@ -62,7 +62,7 @@ class MainEvent():
                 rect_1.y = 1
                 velocity_vec_y = 1
             
-            # Left Border Collision
+            # Left Border Collision 
             if rect_1.x < 0:
                 rect_1.x = 0
                 velocity_vec_x = -(velocity_vec_x * 0.5)
