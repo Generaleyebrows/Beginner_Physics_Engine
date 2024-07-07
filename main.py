@@ -15,12 +15,16 @@ clock = pygame.time.Clock()
 # Objects
 rect_1 = pygame.Rect(300,display_h-50,50,50)
 
+
+
 class MainEvent():
     
     def Main(self):
         
         moving = False
-        
+        velocity_vec_y = 0
+        gravity = 1
+
         while True:
 
             window.fill(pygame.Color(0,0,0,0))
@@ -35,23 +39,49 @@ class MainEvent():
                     moving = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     moving = False
-                elif event.type == pygame.MOUSEMOTION and moving: #every time object is moved by mouse, gravity restarts
+                    position_vec_x = rect_1.x # Set initial Position
+                    position_vec_y = rect_1.y
+                    velocity_vec_x = dx * 2 # Set initial Velocity
+                    velocity_vec_y = dy * 2
+                elif event.type == pygame.MOUSEMOTION and moving: # Every time object is moved by mouse, gravity restarts
                     
                     rect_1.move_ip(event.rel)
                     
-                    dx, dy = event.rel # change in mouse movement for one frame
+                    dx, dy = event.rel # Change in mouse movement for one frame
                     
             if rect_1.y < display_h-50 and moving == False: # rectangle is let go, trajectory is calculated
                 
-                gravity = 9.81
-                velocity_vec_x = dx
-                velocity_vec_y = dy/60
+                #print('hi')
                 
-                velocity_vec_x += velocity_vec_x
-                velocity_vec_y += gravity
+                #velocity_vec_x += velocity_vec_x
+                velocity_vec_y += gravity # Accelerate
                 
-                rect_1.move_ip(velocity_vec_x, velocity_vec_y)
+                position_vec_x += velocity_vec_x # Apply Velocity
+                position_vec_y += velocity_vec_y
 
+                rect_1.x = position_vec_x # Set Position
+                rect_1.y = position_vec_y
+
+            # Bottom Border Collision
+            if rect_1.y > display_h-50:
+                rect_1.y = display_h-50
+
+            # Top Border Collision
+            if rect_1.y < 0:
+                position_vec_y = 1
+                velocity_vec_y = 1
+            
+            # Left Border Collision
+            if rect_1.x < 0:
+                position_vec_x = 0
+                velocity_vec_x = -(velocity_vec_x * 0.5)
+
+            # Right Border Collision
+            if rect_1.x > display_w:
+                position_vec_x = display_w - 50
+                velocity_vec_x = -(velocity_vec_x * 0.5)
+            
+            
             pygame.display.update()
             clock.tick(60)
        
