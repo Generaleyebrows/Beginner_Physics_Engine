@@ -39,9 +39,7 @@ class MainEvent():
                     moving = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     moving = False
-                    velocity_vec_x = dx * 2 # Set initial Velocity
-                    velocity_vec_y = dy * 2
-                elif event.type == pygame.MOUSEMOTION and moving: # Every time object is moved by mouse, gravity restarts
+                elif event.type == pygame.MOUSEMOTION and moving: #every time object is moved by mouse, gravity restarts
                     
                     rect_1.move_ip(event.rel)
                     
@@ -49,30 +47,15 @@ class MainEvent():
                     
             if rect_1.y < display_h-50 and moving == False: # rectangle is let go, trajectory is calculated
                 
-                velocity_vec_y += gravity # Accelerate
+                gravity = 9.81
+                velocity_vec_x = dx
+                velocity_vec_y = dy/60
+                
+                velocity_vec_x += velocity_vec_x
+                velocity_vec_y += gravity
                 
                 rect_1.move_ip(velocity_vec_x, velocity_vec_y)
 
-            # Bottom Border Collision
-            if rect_1.y > display_h-50:
-                rect_1.y = display_h-50
-
-            # Top Border Collision
-            if rect_1.y < 0:
-                rect_1.y = 1
-                velocity_vec_y = 1
-            
-            # Left Border Collision 
-            if rect_1.x < 0:
-                rect_1.x = 0
-                velocity_vec_x = -(velocity_vec_x * 0.5)
-
-            # Right Border Collision
-            if rect_1.x > display_w:
-                rect_1.x = display_w - 50
-                velocity_vec_x = -(velocity_vec_x * 0.5)
-            
-            
             pygame.display.update()
             clock.tick(60)
        
