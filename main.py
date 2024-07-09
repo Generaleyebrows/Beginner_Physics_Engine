@@ -16,13 +16,15 @@ clock = pygame.time.Clock()
 rect_1 = pygame.Rect(300,display_h-50,50,50)
 
 
-
 class MainEvent():
     
     def Main(self):
         
         moving = False
+        velocity_vec_x = 0
         velocity_vec_y = 0
+        dx = 0
+        dy = 0
         gravity = 1
 
         while True:
@@ -41,22 +43,26 @@ class MainEvent():
                     moving = False
                     velocity_vec_x = dx * 2 # Set initial Velocity
                     velocity_vec_y = dy * 2
+                    
                 elif event.type == pygame.MOUSEMOTION and moving: # Every time object is moved by mouse, gravity restarts
                     
-                    rect_1.move_ip(event.rel)
-                    
                     dx, dy = event.rel # Change in mouse movement for one frame
+                    rect_1.move_ip(event.rel)
                     
             if rect_1.y < display_h-50 and moving == False: # rectangle is let go, trajectory is calculated
                 
                 velocity_vec_y += gravity # Accelerate
-                
                 rect_1.move_ip(velocity_vec_x, velocity_vec_y)
+                
+            else: # make it bounce
+                
+                velocity_vec_y = -(velocity_vec_y * 0.5) # stays negative until gravity makes it positive
+                rect_1.move_ip(0, velocity_vec_y)
 
             # Bottom Border Collision
             if rect_1.y > display_h-50:
                 rect_1.y = display_h-50
-
+                    
             # Top Border Collision
             if rect_1.y < 0:
                 rect_1.y = 1
